@@ -1,0 +1,73 @@
+@page "/products"
+@using WarehouseManager.Services
+@using WarehouseManager.Models
+@inject ProductService ProductsService
+
+<h3>Προϊόντα</h3>
+
+@if (products == null)
+{
+    <p>Φόρτωση...</p>
+}
+
+else if (!products.Any())
+{
+    <p>Δεν υπάρχουν προϊόντα.</p>
+}
+
+else
+{
+    <table>
+        <thead>
+        <tr>
+            <th>
+                Κωδικός
+            </th>
+            <th>
+                Όνομα
+            </th>
+            <th>
+                Κατηγορία
+            </th>
+            <th>
+                Τιμή
+            </th>
+            <th>
+                Stock
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var product in products)
+        {
+            <tr>
+                <td>
+                    @product.SKU
+                </td>
+                <td>
+                    @product.Name
+                </td>
+                <td>
+                    @product.Category
+                </td>
+                <td>
+                    @product.Price €
+                </td>
+                <td>
+                    @product.Stock
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+@code {
+    private List<Product>? products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ProductsService.GetAllAsync();
+        
+    }
+
+}

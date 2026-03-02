@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WarehouseManager", "WarehouseManager\WarehouseManager.csproj", "{0AEC9E0D-4581-48A5-9159-7E725B2E06C8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0AEC9E0D-4581-48A5-9159-7E725B2E06C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0AEC9E0D-4581-48A5-9159-7E725B2E06C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0AEC9E0D-4581-48A5-9159-7E725B2E06C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0AEC9E0D-4581-48A5-9159-7E725B2E06C8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
