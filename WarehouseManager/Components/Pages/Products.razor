@@ -5,6 +5,17 @@
 
 <h3>Προϊόντα</h3>
 
+<div>
+    <h4>Προσθήκη Προϊόντος</h4>
+    <input @bind="newProduct.SKU" placeholder="Κωδικός"/>
+    <input @bind="newProduct.Name" placeholder="Όνομα"/>
+    <input @bind="newProduct.Category" placeholder="Κατηγορία"/>
+    <input type="number" @bind="newProduct.Price" placeholder="Τιμή"/>
+    <input type="number" @bind="newProduct.Stock" placeholder="Stock"/>
+    <input type="number" @bind="newProduct.MinStock" placeholder="Ελάχιστο Stock"/>
+    <button @onclick="AddProduct">Προσθήκη</button>
+</div>
+
 @if (products == null)
 {
     <p>Φόρτωση...</p>
@@ -35,6 +46,9 @@ else
             <th>
                 Stock
             </th>
+            <th>
+                Ενέργειες
+            </th>
         </tr>
         </thead>
         <tbody>
@@ -56,6 +70,9 @@ else
                 <td>
                     @product.Stock
                 </td>
+                <td>
+                    <button @onclick="() => DeleteProduct(product.Id)">Διαγραφή</button>
+                </td>
             </tr>
         }
         </tbody>
@@ -64,10 +81,25 @@ else
 @code {
     private List<Product>? products;
 
+    private Product newProduct = new Product();
+
+    private async Task AddProduct()
+    {
+        await ProductsService.AddAsync(newProduct);
+        newProduct = new Product();
+        products = await ProductsService.GetAllAsync();
+    }
+
     protected override async Task OnInitializedAsync()
     {
         products = await ProductsService.GetAllAsync();
         
+    }
+
+    private async Task DeleteProduct(int id)
+    {
+        await ProductsService.DeleteAsync(id);
+        products = await ProductsService.GetAllAsync();
     }
 
 }
