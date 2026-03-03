@@ -1,7 +1,65 @@
 ﻿@page "/"
+@using WarehouseManager.Services
+@using WarehouseManager.Models
+@inject ProductService ProductsService
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Αποθήκη MANASKOS</PageTitle>
 
-<h1>Hello, world!</h1>
+<h3>Dashboard</h3>
 
-Welcome to your new app.
+@if (products == null)
+{
+    <p>Φόρτωση...</p>
+}
+else
+{
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <h4>Συνολικά Προϊόντα</h4>
+            <p>@products.Count</p>
+        </div>
+        <div class="stat-card warning">
+            <h4>Χαμηλό Stock</h4>
+            <p>@lowStockProducts.Count</p>
+        </div>
+    </div>
+
+    @if (lowStockProducts.Any())
+    {
+        <div class="low-stock-alert">
+            <h4>⚠️ Προϊόντα με Χαμηλό Stock</h4>
+            <table class="warehouse-table">
+                <thead>
+                <tr>
+                    <th>Κωδικός</th>
+                    <th>Όνομα</th>
+                    <th>Stock</th>
+                    <th>Ελάχιστο</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var product in lowStockProducts)
+                {
+                    <tr>
+                        <td>@product.SKU</td>
+                        <td>@product.Name</td>
+                        <td>@product.Stock</td>
+                        <td>@product.MinStock</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+}
+
+@code {
+    private List<Product>? products;
+    private List<Product> lowStockProducts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ProductsService.GetAllAsync();
+        lowStockProducts = products.Where(p => p.Stock <= p.MinStock).ToList();
+    }
+}

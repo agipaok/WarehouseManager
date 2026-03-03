@@ -16,6 +16,21 @@
     <button @onclick="AddProduct">Προσθήκη</button>
 </div>
 
+@if (isEditing && editProduct != null)
+{
+    <div class="warehouse-form">
+        <h4>Επεξεργασία Προϊόντος</h4>
+        <input @bind="editProduct.SKU" placeholder="Κωδικός"/>
+        <input @bind="editProduct.Name" placeholder="Όνομα"/>
+        <input @bind="editProduct.Category" placeholder="Κατηγορία"/>
+        <input type="number" @bind="editProduct.Price" placeholder="Τιμή"/>
+        <input type="number" @bind="editProduct.Stock" placeholder="Stock"/>
+        <input type="number" @bind="editProduct.MinStock" placeholder="Ελάχιστο Stock"/>
+        <button @onclick="SaveEdit">Αποθήκευση</button>
+        <button @onclick="() => isEditing = false">Άκυρο</button>
+    </div>
+}
+
 @if (products == null)
 {
     <p>Φόρτωση...</p>
@@ -72,6 +87,7 @@ else
                 </td>
                 <td>
                     <button class="btn-delete" @onclick="() => DeleteProduct(product.Id)">Διαγραφή</button>
+                    <button @onclick="() => StartEdit(product)">Επεξεργασία</button>
                 </td>
             </tr>
         }
@@ -80,6 +96,36 @@ else
 }
 @code {
     private List<Product>? products;
+
+    private Product? editProduct = null;
+    private bool isEditing = false;
+
+    private void StartEdit(Product product)
+    {
+        editProduct = new Product
+        {
+            Id = product.Id,
+            SKU = product.SKU,
+            Name = product.Name,
+            Category = product.Category,
+            Price = product.Price,
+            Stock = product.Stock,
+            MinStock = product.MinStock
+        };
+        isEditing = true;
+    }
+
+    // Δημιουργουμε ενα αντιγραφο οταν αρχισουμε να κανουμε edit ! Ωστε αν πατησουμε cancel να υπαρχει το παλιο
+    private async Task SaveEdit()
+    {
+        if (editProduct != null)
+        {
+            await ProductsService.UpdateAsync(editProduct);
+            isEditing = false;
+            editProduct = null;
+            products = await ProductsService.GetAllAsync();
+        }
+    }
 
     private Product newProduct = new Product();
 

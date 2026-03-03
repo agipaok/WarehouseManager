@@ -26,8 +26,17 @@ public class ProductService
 
     public async Task UpdateAsync(Product product)
     {
-        _db.Products.Update(product);
-        await _db.SaveChangesAsync();
+        var existing = await _db.Products.FindAsync(product.Id);
+        if (existing != null)
+        {
+            existing.SKU = product.SKU;
+            existing.Name = product.Name;
+            existing.Category = product.Category;
+            existing.Price = product.Price;
+            existing.Stock = product.Stock;
+            existing.MinStock = product.MinStock;
+            await _db.SaveChangesAsync();
+        }
     }
 
     public async Task DeleteAsync(int id)
@@ -38,5 +47,10 @@ public class ProductService
             _db.Products.Remove(product);
             await _db.SaveChangesAsync();
         }
+    }
+
+    public async Task<Product?> GetByIdAsync(int id)
+    {
+        return await _db.Products.FindAsync(id);
     }
 }

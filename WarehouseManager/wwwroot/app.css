@@ -103,3 +103,46 @@ h1:focus {
     border-radius: 4px;
     cursor: pointer;
 }
+
+.dashboard-stats {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background-color: #1b6ec2;
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    min-width: 150px;
+    text-align: center;
+}
+
+.stat-card h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+.stat-card p {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.stat-card.warning {
+    background-color: #dc3545;
+}
+
+.low-stock-alert {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.low-stock-alert h4 {
+    color: #856404;
+    margin-bottom: 1rem;
+}
