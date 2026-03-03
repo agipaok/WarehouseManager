@@ -5,7 +5,7 @@
 
 <h3>Προϊόντα</h3>
 
-<div>
+<div class="warehouse-form">
     <h4>Προσθήκη Προϊόντος</h4>
     <input @bind="newProduct.SKU" placeholder="Κωδικός"/>
     <input @bind="newProduct.Name" placeholder="Όνομα"/>
@@ -28,7 +28,7 @@ else if (!products.Any())
 
 else
 {
-    <table>
+    <table class="warehouse-table">
         <thead>
         <tr>
             <th>
@@ -71,7 +71,7 @@ else
                     @product.Stock
                 </td>
                 <td>
-                    <button @onclick="() => DeleteProduct(product.Id)">Διαγραφή</button>
+                    <button class="btn-delete" @onclick="() => DeleteProduct(product.Id)">Διαγραφή</button>
                 </td>
             </tr>
         }

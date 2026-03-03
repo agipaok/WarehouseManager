@@ -49,3 +49,57 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+/* Products Table */
+.warehouse-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.warehouse-table th {
+    background-color: #1b6ec2;
+    color: white;
+    padding: 10px;
+    text-align: left;
+}
+
+.warehouse-table td {
+    padding: 10px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.warehouse-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Form */
+.warehouse-form {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.warehouse-form input {
+    margin: 0.3rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+.warehouse-form button {
+    margin: 0.3rem;
+    padding: 0.4rem 1rem;
+    background-color: #1b6ec2;
+
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.7rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
