@@ -1,0 +1,120 @@
+@page "/suppliers"
+@using WarehouseManager.Services
+@using WarehouseManager.Models
+@inject SupplierService SupplierService
+
+<h3>Προμηθευτές</h3>
+
+<div class="warehouse-form">
+    <h4>Προμηθευτή</h4>
+    <input @bind="newSupplier.Name" placeholder="Επωνυμία" />
+    <input @bind="newSupplier.ContactPerson" placeholder="Υπεύθυνος"/>
+    <input @bind="newSupplier.Phone" placeholder="Τηλέφωνο"/>
+    <input @bind="newSupplier.Email" placeholder="Email"/>
+    <button @onclick="AddSupplier">Πρσθήκη</button>
+</div>
+
+@if (isEditing && editSupplier != null)
+{
+    <div class="warehouse-form">
+        <h4>Επεξεργασία προμηθευτή</h4>
+        <input @bind="editSupplier.Name" placeholder="Επωνυμία"/>
+        <input @bind="editSupplier.ContactPerson" placeholder="Υπεύθυνος"/>
+        <input @bind="editSupplier.Phone" placeholder="Τηλέφωνο"/>
+        <input @bind="editSupplier.Email" placeholder="Email"/>
+        <button @onclick="SaveEdit">Αποθήκευση</button>
+        <button @onclick="() => isEditing = false">Άκυρο</button>
+        
+    </div>
+}
+
+@if (suppliers != null)
+{
+    <p>φόρτωση....</p>
+}
+else if (!suppliers.Any())
+{
+    <p>Δεν υπάρχουν προμηθευτές.</p>
+}
+else
+{
+    <table class="warehouse-table">
+        <thead>
+        <tr>
+            <th>Επωνυμία</th>
+            <th>Υπεύθυνος</th>
+            <th>Τηλέφωνο</th>
+            <th>Email</th>
+            <th>Ενέργειες</th>
+        </tr>
+        </thead>
+        <tbody>
+    
+    @foreach (var supplier in suppliers)
+    {
+        <tr>
+            <td>@supplier.Name</td>
+            <td>@supplier.ContactPerson</td>
+            <td>@supplier.Phone</td>
+            <td>@supplier.Email</td>
+            <td>
+                <button @onclick="() => StartEdit(supplier)">Επεξεργασία</button>
+                <button class="btn-delete" @onclick="() => DeleteSupplier(supplier.Id">Διαγραφή</button>
+            </td>
+        </tr>
+    }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Supplier>? suppliers;
+    private Supplier newSupplier = new Supplier();
+    private Supplier? editSupplier = null;
+    private bool isEditing = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        suppliers = await SupplierService.GetAllAsync();
+    }
+
+    private async Task AddSupplier()
+    {
+        await SupplierService.AddAsync(newSupplier);
+        newSupplier = new Supplier();
+        suppliers = await SupplierService.GetAllAsync();
+    }
+
+    private void StartEdit(Supplier supplier)
+    {
+        editSupplier = new Supplier
+        {
+            Id = supplier.Id,
+            Name = supplier.Name,
+            ContactPerson = supplier.ContactPerson,
+            Phone = supplier.Phone,
+            Email = supplier.Email
+        };
+        isEditing = true;
+    }
+
+    private async Task SaveEdit()
+    {
+        if (editSupplier != null)
+        {
+            await SupplierService.UpdateAsync(editSupplier);
+            isEditing = false;
+            editSupplier = null;
+            suppliers = await SupplierService.GetAllAsync();
+            
+        }
+    }
+
+    private async Task DeleteSupplier(int id)
+    {
+        await SupplierService.DeleteAsync(id);
+        suppliers = await SupplierService.GetAllAsync();
+        
+    }
+
+}

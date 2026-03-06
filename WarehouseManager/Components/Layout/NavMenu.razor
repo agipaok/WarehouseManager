@@ -1,23 +1,22 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Αποθήκη Μανάσκος</a>
+﻿<nav class="flex-column">
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+            <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+        </NavLink>
     </div>
-</div>
-
-<input type="checkbox" title="Navigation menu" class="navbar-toggler"/>
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="products">
-                <span class="bi bi-box-seam-fill" aria-hidden="true"></span> Προϊόντα
-            </NavLink>
-        </div>
-    </nav>
-</div>
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" href="products">
+            <span class="bi bi-box-seam-fill" aria-hidden="true"></span> Προϊόντα
+        </NavLink>
+    </div>
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" href="suppliers">
+            <span class="bi bi-truck" aria-hidden="true"></span> Προμηθευτές
+        </NavLink>
+    </div>
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" href="stock-movements">
+            <span class="bi bi-arrow-left-right" aria-hidden="true"></span> Κινήσεις
+        </NavLink>
+    </div>
+</nav>

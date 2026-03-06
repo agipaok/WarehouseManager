@@ -16,6 +16,11 @@
     <button @onclick="AddProduct">Προσθήκη</button>
 </div>
 
+<div style="margin-bottom: 1rem;">
+    <input @bind="searchTerm" @bind:event="oninput" placeholder="Αναζήτηση προϊόντος..." style="width: 300px; padding: 0.4rem 0.6rem;
+border: 1px solid #ced4da; border-radius: 4px;"/>
+</div>
+
 @if (isEditing && editProduct != null)
 {
     <div class="warehouse-form">
@@ -67,7 +72,9 @@ else
         </tr>
         </thead>
         <tbody>
-        @foreach (var product in products)
+        @foreach (var product in products.Where(p => string.IsNullOrEmpty(searchTerm) || 
+                                                     p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                                                     p.SKU.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)))
         {
             <tr>
                 <td>
@@ -95,6 +102,8 @@ else
     </table>
 }
 @code {
+    private string searchTerm = string.Empty;
+    
     private List<Product>? products;
 
     private Product? editProduct = null;

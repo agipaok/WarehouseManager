@@ -1,0 +1,91 @@
+@page "/stock-movements"
+@using Microsoft.VisualBasic
+@using WarehouseManager.Services
+@using WarehouseManager.Models
+@inject StockMovementService MovementService
+@inject ProductService ProductService
+
+<h3>Κινήσεις αποθήκης</h3>
+
+<div class="warehouse-form">
+    <h4>Νέα Κίνηση</h4>
+    <select @bind="newMovement.ProductId">
+        <option value="0">-- Επιλέξτε Προϊόν --</option>
+        @foreach (var product in products ?? new List<Product>())
+        {
+            <option value="@product.Id">@product.Name
+                (@product.SKU)</option>
+        }
+    </select>
+    <select @bind="newMovement.MovementType">
+        <option value="IN">IN - Εισαγωγή</option>
+        <option value="OUT">OUT - Εξαγωγή</option>
+    </select>
+    <input type="number" @bind="newMovement.Quantity" placeholder="Ποσότητα"/>
+    <input @bind="newMovement.Notes" placeholder="Σημειώσεις"/>
+    <button @onclick="AddMovement">Καταχώρηση</button>
+</div>
+
+@if (movements == null)
+{
+    <p>Φόρτωση...</p>
+}
+else if (!movements.Any())
+{
+    <p>Δεν υπάρχουν κινήσεις.</p>
+}
+else
+{
+    <table class="warehouse-table">
+        <thead>
+        <tr>
+            <th>Ημερομηνία</th>
+            <th>Προϊόν</th>
+            <th>Τύπος</th>
+            <th>Ποσότητα</th>
+            <th>Σημειώσεις</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var movement in movements)
+        {
+            <tr>
+                <td>@movement.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@movement.Product?.Name</td>
+                <td style="color: @(movement.MovementType == "IN" ? "green" : "red")">
+                    @movement.MovementType
+                </td>
+                <td>@movement.Quantity</td>
+                <td>@movement.Notes</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<StockMovement>? movements;
+    private List<Product> products;
+
+    private StockMovement newMovement = new StockMovement
+    {
+        MovementType = "IN"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        movements = await MovementService.GetAllAsync();
+        products = await ProductService.GetAllAsync();
+    }
+
+    private async Task AddMovement()
+    {
+        if (newMovement.ProductId == 0) return;
+        await MovementService.AddAsync(newMovement);
+        newMovement = new StockMovement { MovementType = "IN" };
+        movements = await MovementService.GetAllAsync();
+        products = await ProductService.GetAllAsync();
+
+    }
+
+}

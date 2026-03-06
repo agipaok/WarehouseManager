@@ -8,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=warehouse.db"));
 builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<SupplierService>();
+builder.Services.AddScoped<SupplierService>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
