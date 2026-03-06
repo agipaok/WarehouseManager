@@ -28,7 +28,7 @@
     </div>
 }
 
-@if (suppliers != null)
+@if (suppliers == null)
 {
     <p>φόρτωση....</p>
 }
@@ -59,7 +59,7 @@ else
             <td>@supplier.Email</td>
             <td>
                 <button @onclick="() => StartEdit(supplier)">Επεξεργασία</button>
-                <button class="btn-delete" @onclick="() => DeleteSupplier(supplier.Id">Διαγραφή</button>
+                <button class="btn-delete" @onclick="() => DeleteSupplier(supplier.Id)">Διαγραφή</button>
             </td>
         </tr>
     }

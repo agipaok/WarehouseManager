@@ -30,7 +30,7 @@ else
         </div>
         <div class="stat-card">
             <h4>Κινήσεις σήμερα</h4>
-            <p>@movements?.Count(m => m.CreatedAt.Date == DateTime.Today ) ?? 0)</p>
+            <p>@(movements?.Count(m => m.CreatedAt.Date == DateTime.Today ) ?? 0)</p>
         </div>
     </div>
 
