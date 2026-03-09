@@ -2,29 +2,43 @@
 @using WarehouseManager.Services
 @using WarehouseManager.Models
 @inject SupplierService SupplierService
+@rendermode InteractiveServer
 
 <h3>Προμηθευτές</h3>
 
 <div class="warehouse-form">
     <h4>Προμηθευτή</h4>
-    <input @bind="newSupplier.Name" placeholder="Επωνυμία" />
-    <input @bind="newSupplier.ContactPerson" placeholder="Υπεύθυνος"/>
-    <input @bind="newSupplier.Phone" placeholder="Τηλέφωνο"/>
-    <input @bind="newSupplier.Email" placeholder="Email"/>
-    <button @onclick="AddSupplier">Πρσθήκη</button>
+        <EditForm Model="newSupplier" OnValidSubmit="AddSupplier">
+        <DataAnnotationsValidator/>
+        <InputText @bind-Value="newSupplier.Name" placeholder="Επωνυμία"/>
+        <ValidationMessage For="() => newSupplier.Name"/>
+        <InputText @bind-Value="newSupplier.ContactPerson" placeholder="Υπεύθυνος"/>
+        <ValidationMessage For="() => newSupplier.ContactPerson"/>
+        <InputText @bind-Value="newSupplier.Phone" placeholder="Τηλέφωνο"/>
+        <ValidationMessage For="() => newSupplier.Phone"/>
+        <InputText @bind-Value="newSupplier.Email" placeholder="Email"/>
+        <ValidationMessage For="() => newSupplier.Email"/>
+        <button type="submit">Προσθήκη</button>
+    </EditForm>
 </div>
 
 @if (isEditing && editSupplier != null)
 {
     <div class="warehouse-form">
         <h4>Επεξεργασία προμηθευτή</h4>
-        <input @bind="editSupplier.Name" placeholder="Επωνυμία"/>
-        <input @bind="editSupplier.ContactPerson" placeholder="Υπεύθυνος"/>
-        <input @bind="editSupplier.Phone" placeholder="Τηλέφωνο"/>
-        <input @bind="editSupplier.Email" placeholder="Email"/>
-        <button @onclick="SaveEdit">Αποθήκευση</button>
-        <button @onclick="() => isEditing = false">Άκυρο</button>
-        
+            <EditForm Model="editSupplier" OnValidSubmit="SaveEdit">
+            <DataAnnotationsValidator/>
+            <InputText @bind-Value="editSupplier.Name" placeholder="Επωνυμία"/>
+            <ValidationMessage For="() => editSupplier.Name"/>
+            <InputText @bind-Value="editSupplier.ContactPerson" placeholder="Υπεύθυνος"/>
+            <ValidationMessage For="() => editSupplier.ContactPerson"/>
+            <InputText @bind-Value="editSupplier.Phone" placeholder="Τηλέφωνο"/>
+            <ValidationMessage For="() => editSupplier.Phone"/>
+            <InputText @bind-Value="editSupplier.Email" placeholder="Email"/>
+            <ValidationMessage For="() => editSupplier.Email"/>
+            <button type="submit">Αποθήκευση</button>
+            <button type="button" @onclick="() => isEditing = false">Άκυρο</button>
+        </EditForm>
     </div>
 }
 

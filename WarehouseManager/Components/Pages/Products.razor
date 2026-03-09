@@ -38,15 +38,27 @@ border: 1px solid #ced4da; border-radius: 4px;"/>
 @if (isEditing && editProduct != null)
 {
     <div class="warehouse-form">
-        <h4>Επεξεργασία Προϊόντος</h4>
-        <input @bind="editProduct.SKU" placeholder="Κωδικός"/>
-        <input @bind="editProduct.Name" placeholder="Όνομα"/>
-        <input @bind="editProduct.Category" placeholder="Κατηγορία"/>
-        <input type="number" @bind="editProduct.Price" placeholder="Τιμή"/>
-        <input type="number" @bind="editProduct.Stock" placeholder="Stock"/>
-        <input type="number" @bind="editProduct.MinStock" placeholder="Ελάχιστο Stock"/>
-        <button @onclick="SaveEdit">Αποθήκευση</button>
-        <button @onclick="() => isEditing = false">Άκυρο</button>
+        <EditForm Model="editProduct" OnValidSubmit="SaveEdit">
+            <DataAnnotationsValidator /> 
+            <ValidationSummary/>
+            <InputText @bind-Value="editProduct.SKU" placeholder="Κωδικός"/>
+            <ValidationMessage For="@(() => editProduct.SKU)" />
+            <InputText @bind-Value="editProduct.Name" placeholder="Όνομα" />
+            <ValidationMessage For="@(() => editProduct.Name)" />
+
+            <InputText @bind-Value="editProduct.Category" placeholder="Κατηγορία" />
+
+            <InputNumber @bind-Value="editProduct.Price" placeholder="Τιμή" />
+            <ValidationMessage For="@(() => editProduct.Price)" />
+
+            <InputNumber @bind-Value="editProduct.Stock" placeholder="Stock" />
+            <ValidationMessage For="@(() => editProduct.Stock)" />
+
+            <InputNumber @bind-Value="editProduct.MinStock" placeholder="Ελάχιστο Stock" />
+            <ValidationMessage For="@(() => editProduct.MinStock)" />
+            <button type="submit">Αποθήκευση</button>
+            <button type="button" @onclick="() => isEditing = false">Άκυρο</button>
+        </EditForm>
     </div>
 }
 
