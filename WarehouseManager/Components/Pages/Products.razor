@@ -2,18 +2,32 @@
 @using WarehouseManager.Services
 @using WarehouseManager.Models
 @inject ProductService ProductsService
+@rendermode InteractiveServer
 
 <h3>Προϊόντα</h3>
 
 <div class="warehouse-form">
     <h4>Προσθήκη Προϊόντος</h4>
-    <input @bind="newProduct.SKU" placeholder="Κωδικός"/>
-    <input @bind="newProduct.Name" placeholder="Όνομα"/>
-    <input @bind="newProduct.Category" placeholder="Κατηγορία"/>
-    <input type="number" @bind="newProduct.Price" placeholder="Τιμή"/>
-    <input type="number" @bind="newProduct.Stock" placeholder="Stock"/>
-    <input type="number" @bind="newProduct.MinStock" placeholder="Ελάχιστο Stock"/>
-    <button @onclick="AddProduct">Προσθήκη</button>
+    <EditForm Model="newProduct" OnValidSubmit="AddProduct">
+        <DataAnnotationsValidator /> 
+        <ValidationSummary/>
+        <InputText @bind-Value="newProduct.SKU" placeholder="Κωδικός"/>
+        <ValidationMessage For="@(() => newProduct.SKU)" />
+        <InputText @bind-Value="newProduct.Name" placeholder="Όνομα" />
+        <ValidationMessage For="@(() => newProduct.Name)" />
+
+        <InputText @bind-Value="newProduct.Category" placeholder="Κατηγορία" />
+
+        <InputNumber @bind-Value="newProduct.Price" placeholder="Τιμή" />
+        <ValidationMessage For="@(() => newProduct.Price)" />
+
+        <InputNumber @bind-Value="newProduct.Stock" placeholder="Stock" />
+        <ValidationMessage For="@(() => newProduct.Stock)" />
+
+        <InputNumber @bind-Value="newProduct.MinStock" placeholder="Ελάχιστο Stock" />
+        <ValidationMessage For="@(() => newProduct.MinStock)" />
+    <button type="submit">Προσθήκη</button>
+    </EditForm>
 </div>
 
 <div style="margin-bottom: 1rem;">
