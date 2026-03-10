@@ -24,6 +24,14 @@
     </select>
     <input type="number" @bind="newMovement.Quantity" placeholder="Ποσότητα"/>
     <input @bind="newMovement.Notes" placeholder="Σημειώσεις"/>
+    @if (errorMessage != null)
+    {
+        <p style="color: red;">@errorMessage</p>
+    }
+    @if (successMessage != null)
+    {
+        <p style="color: green">@successMessage</p>
+    }
     <button @onclick="AddMovement">Καταχώρηση</button>
 </div>
 
@@ -67,6 +75,8 @@ else
 @code {
     private List<StockMovement>? movements;
     private List<Product> products;
+    private string errorMessage;
+    private string successMessage;
 
     private StockMovement newMovement = new StockMovement
     {
@@ -81,11 +91,26 @@ else
 
     private async Task AddMovement()
     {
-        if (newMovement.ProductId == 0) return;
-        await MovementService.AddAsync(newMovement);
-        newMovement = new StockMovement { MovementType = "IN" };
-        movements = await MovementService.GetAllAsync();
-        products = await ProductService.GetAllAsync();
+        errorMessage = null;
+        successMessage = null;
+        if (newMovement.ProductId == 0)
+        {
+            errorMessage = "Επιλέξτε προϊόν!";
+            return;
+        }
+
+        var result = await MovementService.AddAsync(newMovement);
+        if (result)
+        {
+            successMessage = "Η κίνηση καταχωρήθηκε!";
+            newMovement = new StockMovement { MovementType = "IN" };
+            movements = await MovementService.GetAllAsync();
+            products = await ProductService.GetAllAsync();
+        }
+        else
+        {
+            errorMessage = "Δεν υπάρχει αρκετό stock για OUT κίνηση!";
+        }
 
     }
 

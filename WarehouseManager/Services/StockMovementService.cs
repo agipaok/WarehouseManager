@@ -20,20 +20,19 @@ public class StockMovementService
             .ToListAsync();
     }
 
-    public async Task AddAsync(StockMovement movement)
+    public async Task<bool> AddAsync(StockMovement movement)
     {
-        _db.StockMovements.Add(movement);
-        
         var product = await _db.Products.FindAsync(movement.ProductId);
-
-        if (product != null)
-        {
-            if (movement.MovementType == "IN")
-                product.Stock += movement.Quantity;
-            else if  (movement.MovementType == "OUT")
-                product.Stock -= movement.Quantity;
-        }
+        if (product == null) return  false;
+        if (movement.MovementType == "OUT" && product.Stock - movement.Quantity < 0)
+            return  false;
+        if (movement.MovementType == "IN")
+            product.Stock += movement.Quantity;
+        else if (movement.MovementType == "OUT")
+            product.Stock -= movement.Quantity;
+        _db.StockMovements.Add(movement);
         await _db.SaveChangesAsync();
+        return true;
     }
 }
 

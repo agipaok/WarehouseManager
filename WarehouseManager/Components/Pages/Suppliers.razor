@@ -3,12 +3,13 @@
 @using WarehouseManager.Models
 @inject SupplierService SupplierService
 @rendermode InteractiveServer
+@inject IJSRuntime JS
 
 <h3>Προμηθευτές</h3>
 
 <div class="warehouse-form">
     <h4>Προμηθευτή</h4>
-        <EditForm Model="newSupplier" OnValidSubmit="AddSupplier">
+    <EditForm Model="newSupplier" OnValidSubmit="AddSupplier">
         <DataAnnotationsValidator/>
         <InputText @bind-Value="newSupplier.Name" placeholder="Επωνυμία"/>
         <ValidationMessage For="() => newSupplier.Name"/>
@@ -22,11 +23,12 @@
     </EditForm>
 </div>
 
+
 @if (isEditing && editSupplier != null)
 {
     <div class="warehouse-form">
         <h4>Επεξεργασία προμηθευτή</h4>
-            <EditForm Model="editSupplier" OnValidSubmit="SaveEdit">
+        <EditForm Model="editSupplier" OnValidSubmit="SaveEdit">
             <DataAnnotationsValidator/>
             <InputText @bind-Value="editSupplier.Name" placeholder="Επωνυμία"/>
             <ValidationMessage For="() => editSupplier.Name"/>
@@ -40,6 +42,15 @@
             <button type="button" @onclick="() => isEditing = false">Άκυρο</button>
         </EditForm>
     </div>
+}
+
+@if (errorMessage != null)
+{
+    <p style="color: red;">@errorMessage</p>
+}
+@if (successMessage != null)
+{
+    <p style="color: green;">@successMessage</p>
 }
 
 @if (suppliers == null)
@@ -86,6 +97,8 @@ else
     private Supplier newSupplier = new Supplier();
     private Supplier? editSupplier = null;
     private bool isEditing = false;
+    private string? errorMessage;
+    private string? successMessage;
 
     protected override async Task OnInitializedAsync()
     {
@@ -94,9 +107,12 @@ else
 
     private async Task AddSupplier()
     {
+        successMessage = null;
+        errorMessage = null;
         await SupplierService.AddAsync(newSupplier);
         newSupplier = new Supplier();
         suppliers = await SupplierService.GetAllAsync();
+        successMessage = "Ο προμηθευτής καταχωρήθηκε!";
     }
 
     private void StartEdit(Supplier supplier)
@@ -120,12 +136,15 @@ else
             isEditing = false;
             editSupplier = null;
             suppliers = await SupplierService.GetAllAsync();
+            successMessage = "Ο προμηθευτής ενημερώθηκε!";
             
         }
     }
 
     private async Task DeleteSupplier(int id)
     {
+        var confirmed = await JS.InvokeAsync<bool>("confirm", "Είσαι σίγουρος για την διαγραφή");
+        if (!confirmed) return;
         await SupplierService.DeleteAsync(id);
         suppliers = await SupplierService.GetAllAsync();
         

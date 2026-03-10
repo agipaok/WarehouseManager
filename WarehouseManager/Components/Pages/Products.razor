@@ -3,6 +3,7 @@
 @using WarehouseManager.Models
 @inject ProductService ProductsService
 @rendermode InteractiveServer
+@inject IJSRuntime JS
 
 <h3>Προϊόντα</h3>
 
@@ -60,6 +61,15 @@ border: 1px solid #ced4da; border-radius: 4px;"/>
             <button type="button" @onclick="() => isEditing = false">Άκυρο</button>
         </EditForm>
     </div>
+}
+
+@if (errorMessage != null)
+{
+    <p style="color: red;">@errorMessage</p>
+}
+@if (successMessage != null)
+{
+    <p style="color: green;">@successMessage</p>
 }
 
 @if (products == null)
@@ -129,11 +139,14 @@ else
 }
 @code {
     private string searchTerm = string.Empty;
-    
+
     private List<Product>? products;
 
     private Product? editProduct = null;
     private bool isEditing = false;
+
+    private string? errorMessage;
+    private string? successMessage;
 
     private void StartEdit(Product product)
     {
@@ -159,6 +172,7 @@ else
             isEditing = false;
             editProduct = null;
             products = await ProductsService.GetAllAsync();
+            successMessage = "Το προϊόν ενημερώθηκε!";
         }
     }
 
@@ -166,19 +180,24 @@ else
 
     private async Task AddProduct()
     {
+        successMessage = null;
+        errorMessage = null;
         await ProductsService.AddAsync(newProduct);
         newProduct = new Product();
         products = await ProductsService.GetAllAsync();
+        successMessage = "Το προϊόν προστέθηκε!";
     }
 
     protected override async Task OnInitializedAsync()
     {
         products = await ProductsService.GetAllAsync();
-        
+
     }
 
     private async Task DeleteProduct(int id)
     {
+        var confirmed = await JS.InvokeAsync<bool>("confirm", "Είσαι σίγουρος για την διαγραφή");
+        if (!confirmed) return;
         await ProductsService.DeleteAsync(id);
         products = await ProductsService.GetAllAsync();
     }
