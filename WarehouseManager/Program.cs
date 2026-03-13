@@ -1,5 +1,6 @@
 using WarehouseManager.Components;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor.Services;
 using WarehouseManager.Data;
 using WarehouseManager.Services;
 
@@ -10,6 +11,7 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data S
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<SupplierService>();
 builder.Services.AddScoped<StockMovementService>();
+builder.Services.AddMudServices();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

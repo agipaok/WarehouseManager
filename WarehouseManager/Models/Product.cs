@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 namespace WarehouseManager.Models;
 
 
+
 public class Product
 {
     public int Id { get; set; }
