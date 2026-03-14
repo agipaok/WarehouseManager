@@ -7,34 +7,80 @@
 
 <h3>Προϊόντα</h3>
 
-<div class="warehouse-form">
-    <h4>Προσθήκη Προϊόντος</h4>
+
+<MudPaper Class="pa-4 mb-4" Elevation="1">
+    <MudText Typo="Typo.h6" Class="mb=3">Προσθήκη προϊόντος</MudText>
+    
     <EditForm Model="newProduct" OnValidSubmit="AddProduct">
-        <DataAnnotationsValidator /> 
+        <DataAnnotationsValidator/>
+        
         <ValidationSummary/>
-        <InputText @bind-Value="newProduct.SKU" placeholder="Κωδικός"/>
-        <ValidationMessage For="@(() => newProduct.SKU)" />
-        <InputText @bind-Value="newProduct.Name" placeholder="Όνομα" />
-        <ValidationMessage For="@(() => newProduct.Name)" />
-
-        <InputText @bind-Value="newProduct.Category" placeholder="Κατηγορία" />
-
-        <InputNumber @bind-Value="newProduct.Price" placeholder="Τιμή" />
-        <ValidationMessage For="@(() => newProduct.Price)" />
-
-        <InputNumber @bind-Value="newProduct.Stock" placeholder="Stock" />
-        <ValidationMessage For="@(() => newProduct.Stock)" />
-
-        <InputNumber @bind-Value="newProduct.MinStock" placeholder="Ελάχιστο Stock" />
-        <ValidationMessage For="@(() => newProduct.MinStock)" />
-    <button type="submit">Προσθήκη</button>
+    
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudTextField Label="Κωδικός"
+                              @bind-Value="newProduct.SKU"
+                              Variant="Variant.Outlined"/>
+            </MudItem>
+        
+            <MudItem xs="12" md="6">
+                <MudTextField Label="Όνομα"
+                              @bind-Value="newProduct.Name"
+                              Variant="Variant.Outlined"/>
+            </MudItem>
+        
+            <MudItem xs="12" md="6">
+                <MudTextField Label="Κατηγορία"
+                              @bind-Value="newProduct.Category"
+                              Variant="Variant.Outlined"/>
+            </MudItem>
+        
+            <MudItem xs="12" md="3">
+                <MudTextField Label="Τιμή"
+                              @bind-Value="newProduct.Price"
+                              Variant="Variant.Outlined"/>
+            </MudItem>
+        
+            <MudItem xs="12" md="3">
+                <MudTextField Label="Stock"
+                              @bind-Value="newProduct.Stock"
+                              Variant="Variant.Outlined"/>
+            </MudItem>
+        
+            <MudItem xs="12" md="3">
+                <MudTextField Label="Min Stock"
+                              @bind-Value="newProduct.MinStock"
+                              Variant="Variant.Outlined"/>
+            </MudItem>
+    
+        </MudGrid>
+        
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   class="mt-3"
+                   ButtonType="ButtonType.Submit">
+    
+            Προσθήκη
+        </MudButton>
+    
     </EditForm>
-</div>
+    
+    
+</MudPaper>
 
-<div style="margin-bottom: 1rem;">
-    <input @bind="searchTerm" @bind:event="oninput" placeholder="Αναζήτηση προϊόντος..." style="width: 300px; padding: 0.4rem 0.6rem;
-border: 1px solid #ced4da; border-radius: 4px;"/>
-</div>
+
+<MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-4">
+    <MudText Typo="Typo.h4">Προϊόντα</MudText>
+    
+    <MudTextField @bind-Value="searchTerm"
+                  Style="width: 300px"
+                  Immediate="true"
+                  Placeholder="Αναζήτηση προϊόντος...."
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search"></MudTextField>
+</MudStack>
 
 @if (isEditing && editProduct != null)
 {
@@ -201,5 +247,5 @@ else
         await ProductsService.DeleteAsync(id);
         products = await ProductsService.GetAllAsync();
     }
-
+    
 }
