@@ -1,4 +1,5 @@
 @page "/products"
+@using Microsoft.AspNetCore.Mvc.Infrastructure
 @using WarehouseManager.Services
 @using WarehouseManager.Models
 @inject ProductService ProductsService
@@ -85,107 +86,253 @@
                   AdornmentIcon="@Icons.Material.Filled.Search"></MudTextField>
 </MudStack>
 
+@* @if (isEditing && editProduct != null) *@
+@* { *@
+@*     <div class="warehouse-form"> *@
+@*         <EditForm Model="editProduct" OnValidSubmit="SaveEdit"> *@
+@*             <DataAnnotationsValidator />  *@
+@*             <ValidationSummary/> *@
+@*             <InputText @bind-Value="editProduct.SKU" placeholder="Κωδικός"/> *@
+@*             <ValidationMessage For="@(() => editProduct.SKU)" /> *@
+@*             <InputText @bind-Value="editProduct.Name" placeholder="Όνομα" /> *@
+@*             <ValidationMessage For="@(() => editProduct.Name)" /> *@
+@* *@
+@*             <InputText @bind-Value="editProduct.Category" placeholder="Κατηγορία" /> *@
+@* *@
+@*             <InputNumber @bind-Value="editProduct.Price" placeholder="Τιμή" /> *@
+@*             <ValidationMessage For="@(() => editProduct.Price)" /> *@
+@* *@
+@*             <InputNumber @bind-Value="editProduct.Stock" placeholder="Stock" /> *@
+@*             <ValidationMessage For="@(() => editProduct.Stock)" /> *@
+@* *@
+@*             <InputNumber @bind-Value="editProduct.MinStock" placeholder="Ελάχιστο Stock" /> *@
+@*             <ValidationMessage For="@(() => editProduct.MinStock)" /> *@
+@*             <button type="submit">Αποθήκευση</button> *@
+@*             <button type="button" @onclick="() => isEditing = false">Άκυρο</button> *@
+@*         </EditForm> *@
+@*     </div> *@
+@* } *@
+
+
 @if (isEditing && editProduct != null)
 {
-    <div class="warehouse-form">
+    <MudPaper Class="pa-4 mb-4" Elevation="1">
+        <MudText Typo="Typo.h6" Class="mb-3">Επεξεργασία προϊόντος</MudText>
+        
         <EditForm Model="editProduct" OnValidSubmit="SaveEdit">
-            <DataAnnotationsValidator /> 
+            <DataAnnotationsValidator/>
             <ValidationSummary/>
-            <InputText @bind-Value="editProduct.SKU" placeholder="Κωδικός"/>
-            <ValidationMessage For="@(() => editProduct.SKU)" />
-            <InputText @bind-Value="editProduct.Name" placeholder="Όνομα" />
-            <ValidationMessage For="@(() => editProduct.Name)" />
-
-            <InputText @bind-Value="editProduct.Category" placeholder="Κατηγορία" />
-
-            <InputNumber @bind-Value="editProduct.Price" placeholder="Τιμή" />
-            <ValidationMessage For="@(() => editProduct.Price)" />
-
-            <InputNumber @bind-Value="editProduct.Stock" placeholder="Stock" />
-            <ValidationMessage For="@(() => editProduct.Stock)" />
-
-            <InputNumber @bind-Value="editProduct.MinStock" placeholder="Ελάχιστο Stock" />
-            <ValidationMessage For="@(() => editProduct.MinStock)" />
-            <button type="submit">Αποθήκευση</button>
-            <button type="button" @onclick="() => isEditing = false">Άκυρο</button>
+            
+            <MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudTextField Label="Κωδικός"
+                                  @bind-Value="editProduct.SKU"
+                                  Variant="Variant.Outlined"/>
+                </MudItem>
+                
+                <MudItem xs="12" md="6">
+                    <MudTextField Label="Όνομα"
+                                  @bind-Value="editProduct.Name"
+                                  Variant="Variant.Outlined"/>
+                </MudItem>
+                
+                <MudItem xs="12" md="6">
+                    <MudTextField Label="Κατηγορία"
+                                  @bind-Value="editProduct.Category"
+                                  Variant="Variant.Outlined"/>
+                </MudItem>
+                
+                <MudItem xs="12" md="3">
+                    <MudNumericField T="decimal"
+                                     Label="Κωδικός"
+                                     @bind-Value="editProduct.Price"
+                                     Variant="Variant.Outlined"/>
+                </MudItem>
+                
+                <MudItem xs="12" md="3">
+                    <MudNumericField 
+                        T="int"
+                        Label="Stock"
+                        @bind-Value="editProduct.Stock"
+                        Variant="Variant.Outlined"/>
+                </MudItem>
+                
+                <MudItem xs="12" md="3">
+                    <MudNumericField 
+                        T="int"
+                        Label="Min Stock"
+                        @bind-Value="editProduct.MinStock"
+                        
+                        Variant="Variant.Outlined"/>
+                </MudItem>
+                
+            </MudGrid>
+            
+            <MudStack Row="true" Spacing="2" Class="mt-3">
+                <MudButton ButtonType="ButtonType.Submit"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary">
+                    Αποθήκευση
+                </MudButton>
+                
+                <MudButton ButtonType="ButtonType.Button"
+                           Variant="Variant.Outlined"
+                           Color="Color.Secondary"
+                           @onclick="CancelEdit">
+                    Άκυρο
+                </MudButton>
+            </MudStack>
         </EditForm>
-    </div>
+    </MudPaper>
 }
 
-@if (errorMessage != null)
+@* @if (errorMessage != null) *@
+@* { *@
+@*     <p style="color: red;">@errorMessage</p> *@
+@* } *@
+@* @if (successMessage != null) *@
+@* { *@
+@*     <p style="color: green;">@successMessage</p> *@
+@* } *@
+@* *@
+@* @if (products == null) *@
+@* { *@
+@*     <p>Φόρτωση...</p> *@
+@* } *@
+@* *@
+@* else if (!products.Any()) *@
+@* { *@
+@*     <p>Δεν υπάρχουν προϊόντα.</p> *@
+@* } *@
+
+@if (!string.IsNullOrWhiteSpace(errorMessage))
 {
-    <p style="color: red;">@errorMessage</p>
+    <MudAlert Severity="Severity.Error" Class="mb-4">
+        @errorMessage
+    </MudAlert>
 }
-@if (successMessage != null)
+
+@if (!string.IsNullOrWhiteSpace(successMessage))
 {
-    <p style="color: green;">@successMessage</p>
+    <MudAlert Severity="Severity.Success" Class="mb-4">
+        @successMessage
+    </MudAlert>
 }
 
 @if (products == null)
 {
-    <p>Φόρτωση...</p>
+    <MudProgressCircular Indeterminate="true" Class="my-4" />
+    <MudText Typo="Typo.body1">Φόρτωση...</MudText>
 }
-
 else if (!products.Any())
 {
-    <p>Δεν υπάρχουν προϊόντα.</p>
+    <MudAlert Severity="Severity.Info" Class="mb-4">
+        Δεν υπάρχουν προϊόντα.
+    </MudAlert>
 }
+
+@* else *@
+@* { *@
+@*     <table class="warehouse-table"> *@
+@*         <thead> *@
+@*         <tr> *@
+@*             <th> *@
+@*                 Κωδικός *@
+@*             </th> *@
+@*             <th> *@
+@*                 Όνομα *@
+@*             </th> *@
+@*             <th> *@
+@*                 Κατηγορία *@
+@*             </th> *@
+@*             <th> *@
+@*                 Τιμή *@
+@*             </th> *@
+@*             <th> *@
+@*                 Stock *@
+@*             </th> *@
+@*             <th> *@
+@*                 Ενέργειες *@
+@*             </th> *@
+@*         </tr> *@
+@*         </thead> *@
+@*         <tbody> *@
+@*         @foreach (var product in products.Where(p => string.IsNullOrEmpty(searchTerm) ||  *@
+@*                                                      p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || *@
+@*                                                      p.SKU.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))) *@
+@*         { *@
+@*             <tr> *@
+@*                 <td> *@
+@*                     @product.SKU *@
+@*                 </td> *@
+@*                 <td> *@
+@*                     @product.Name *@
+@*                 </td> *@
+@*                 <td> *@
+@*                     @product.Category *@
+@*                 </td> *@
+@*                 <td> *@
+@*                     @product.Price € *@
+@*                 </td> *@
+@*                 <td> *@
+@*                     @product.Stock *@
+@*                 </td> *@
+@*                 <td> *@
+@*                     <button class="btn-delete" @onclick="() => DeleteProduct(product.Id)">Διαγραφή</button> *@
+@*                     <button @onclick="() => StartEdit(product)">Επεξεργασία</button> *@
+@*                 </td> *@
+@*             </tr> *@
+@*         } *@
+@*         </tbody> *@
+@*     </table> *@
+@* } *@
 
 else
 {
-    <table class="warehouse-table">
-        <thead>
-        <tr>
-            <th>
-                Κωδικός
-            </th>
-            <th>
-                Όνομα
-            </th>
-            <th>
-                Κατηγορία
-            </th>
-            <th>
-                Τιμή
-            </th>
-            <th>
-                Stock
-            </th>
-            <th>
-                Ενέργειες
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var product in products.Where(p => string.IsNullOrEmpty(searchTerm) || 
-                                                     p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                                                     p.SKU.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)))
-        {
-            <tr>
-                <td>
-                    @product.SKU
-                </td>
-                <td>
-                    @product.Name
-                </td>
-                <td>
-                    @product.Category
-                </td>
-                <td>
-                    @product.Price €
-                </td>
-                <td>
-                    @product.Stock
-                </td>
-                <td>
-                    <button class="btn-delete" @onclick="() => DeleteProduct(product.Id)">Διαγραφή</button>
-                    <button @onclick="() => StartEdit(product)">Επεξεργασία</button>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    <MudTable Items="filteredProducts" Hover="true" Striped="true" Bordered="true" Dense="true">
+        <HeaderContent>
+            <MudTh>Κωδικός</MudTh>
+            <MudTh>Όνομα</MudTh>
+            <MudTh>Κατηγορία</MudTh>
+            <MudTh>Τιμή</MudTh>
+            <MudTh>Stock</MudTh>
+            <MudTh>Ενέργειες</MudTh>
+        </HeaderContent>
+        
+        <RowTemplate>
+            <MudTd DataLabel="Κωδικός">@context.SKU</MudTd>
+            <MudTd DataLabel="Όνομα">@context.Name</MudTd>
+            <MudTd DataLabel="Κατηγορία">@context.Category</MudTd>
+            <MudTd DataLabel="Τιμή">@context.Price.ToString("0.00") €</MudTd>
+            <MudTd DataLabel="Stock">
+                <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                    <MudText>@context.Stock</MudText>
+                    
+                    @if (context.Stock <= context.MinStock)
+                    {
+                        <MudChip T="string" Color="Color.Error" Variant="Variant.Filled" Size="Size.Small">
+                            Low
+                        </MudChip>
+                    }
+                </MudStack>
+            </MudTd>
+            <MudTd DataLabel="Ενέργειες">
+                <MudStack Row="true" Spacing="1">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                   Color="Color.Primary"
+                                   Size="Size.Medium"
+                                   OnClick="() => StartEdit(context)" />
+                
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                   Color="Color.Error"
+                                   Size="Size.Medium"
+                                   OnClick="() => DeleteProduct(context.Id)"/>
+                </MudStack>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
 }
+
 @code {
     private string searchTerm = string.Empty;
 
@@ -196,6 +343,13 @@ else
 
     private string? errorMessage;
     private string? successMessage;
+
+    private IEnumerable<Product> filteredProducts =>
+        products?.Where(p =>
+            string.IsNullOrWhiteSpace(searchTerm) ||
+            p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            p.SKU.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+        ?? Enumerable.Empty<Product>();
 
     private void StartEdit(Product product)
     {
@@ -249,6 +403,12 @@ else
         if (!confirmed) return;
         await ProductsService.DeleteAsync(id);
         products = await ProductsService.GetAllAsync();
+    }
+
+    private void CancelEdit()
+    {
+        isEditing = false;
+        editProduct = null;
     }
     
 }
