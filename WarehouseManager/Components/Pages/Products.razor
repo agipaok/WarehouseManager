@@ -1,5 +1,4 @@
 @page "/products"
-@using Microsoft.AspNetCore.Mvc.Infrastructure
 @using WarehouseManager.Services
 @using WarehouseManager.Models
 @inject ProductService ProductsService
@@ -86,33 +85,6 @@
                   AdornmentIcon="@Icons.Material.Filled.Search"></MudTextField>
 </MudStack>
 
-@* @if (isEditing && editProduct != null) *@
-@* { *@
-@*     <div class="warehouse-form"> *@
-@*         <EditForm Model="editProduct" OnValidSubmit="SaveEdit"> *@
-@*             <DataAnnotationsValidator />  *@
-@*             <ValidationSummary/> *@
-@*             <InputText @bind-Value="editProduct.SKU" placeholder="Κωδικός"/> *@
-@*             <ValidationMessage For="@(() => editProduct.SKU)" /> *@
-@*             <InputText @bind-Value="editProduct.Name" placeholder="Όνομα" /> *@
-@*             <ValidationMessage For="@(() => editProduct.Name)" /> *@
-@* *@
-@*             <InputText @bind-Value="editProduct.Category" placeholder="Κατηγορία" /> *@
-@* *@
-@*             <InputNumber @bind-Value="editProduct.Price" placeholder="Τιμή" /> *@
-@*             <ValidationMessage For="@(() => editProduct.Price)" /> *@
-@* *@
-@*             <InputNumber @bind-Value="editProduct.Stock" placeholder="Stock" /> *@
-@*             <ValidationMessage For="@(() => editProduct.Stock)" /> *@
-@* *@
-@*             <InputNumber @bind-Value="editProduct.MinStock" placeholder="Ελάχιστο Stock" /> *@
-@*             <ValidationMessage For="@(() => editProduct.MinStock)" /> *@
-@*             <button type="submit">Αποθήκευση</button> *@
-@*             <button type="button" @onclick="() => isEditing = false">Άκυρο</button> *@
-@*         </EditForm> *@
-@*     </div> *@
-@* } *@
-
 
 @if (isEditing && editProduct != null)
 {
@@ -144,7 +116,7 @@
                 
                 <MudItem xs="12" md="3">
                     <MudNumericField T="decimal"
-                                     Label="Κωδικός"
+                                     Label="Τιμή"
                                      @bind-Value="editProduct.Price"
                                      Variant="Variant.Outlined"/>
                 </MudItem>
@@ -186,24 +158,6 @@
     </MudPaper>
 }
 
-@* @if (errorMessage != null) *@
-@* { *@
-@*     <p style="color: red;">@errorMessage</p> *@
-@* } *@
-@* @if (successMessage != null) *@
-@* { *@
-@*     <p style="color: green;">@successMessage</p> *@
-@* } *@
-@* *@
-@* @if (products == null) *@
-@* { *@
-@*     <p>Φόρτωση...</p> *@
-@* } *@
-@* *@
-@* else if (!products.Any()) *@
-@* { *@
-@*     <p>Δεν υπάρχουν προϊόντα.</p> *@
-@* } *@
 
 @if (!string.IsNullOrWhiteSpace(errorMessage))
 {
@@ -231,61 +185,6 @@ else if (!products.Any())
     </MudAlert>
 }
 
-@* else *@
-@* { *@
-@*     <table class="warehouse-table"> *@
-@*         <thead> *@
-@*         <tr> *@
-@*             <th> *@
-@*                 Κωδικός *@
-@*             </th> *@
-@*             <th> *@
-@*                 Όνομα *@
-@*             </th> *@
-@*             <th> *@
-@*                 Κατηγορία *@
-@*             </th> *@
-@*             <th> *@
-@*                 Τιμή *@
-@*             </th> *@
-@*             <th> *@
-@*                 Stock *@
-@*             </th> *@
-@*             <th> *@
-@*                 Ενέργειες *@
-@*             </th> *@
-@*         </tr> *@
-@*         </thead> *@
-@*         <tbody> *@
-@*         @foreach (var product in products.Where(p => string.IsNullOrEmpty(searchTerm) ||  *@
-@*                                                      p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || *@
-@*                                                      p.SKU.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))) *@
-@*         { *@
-@*             <tr> *@
-@*                 <td> *@
-@*                     @product.SKU *@
-@*                 </td> *@
-@*                 <td> *@
-@*                     @product.Name *@
-@*                 </td> *@
-@*                 <td> *@
-@*                     @product.Category *@
-@*                 </td> *@
-@*                 <td> *@
-@*                     @product.Price € *@
-@*                 </td> *@
-@*                 <td> *@
-@*                     @product.Stock *@
-@*                 </td> *@
-@*                 <td> *@
-@*                     <button class="btn-delete" @onclick="() => DeleteProduct(product.Id)">Διαγραφή</button> *@
-@*                     <button @onclick="() => StartEdit(product)">Επεξεργασία</button> *@
-@*                 </td> *@
-@*             </tr> *@
-@*         } *@
-@*         </tbody> *@
-@*     </table> *@
-@* } *@
 
 else
 {

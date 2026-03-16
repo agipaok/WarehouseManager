@@ -7,89 +7,166 @@
 
 <h3>Προμηθευτές</h3>
 
-<div class="warehouse-form">
-    <h4>Προμηθευτή</h4>
+<MudPaper Class="pa-4 mb-4" Elevation="1">
+    <MudText Typo="Typo.h6" Class="mb-3">Προσθήκη προμηθευτή</MudText>
+    
     <EditForm Model="newSupplier" OnValidSubmit="AddSupplier">
         <DataAnnotationsValidator/>
-        <InputText @bind-Value="newSupplier.Name" placeholder="Επωνυμία"/>
-        <ValidationMessage For="() => newSupplier.Name"/>
-        <InputText @bind-Value="newSupplier.ContactPerson" placeholder="Υπεύθυνος"/>
-        <ValidationMessage For="() => newSupplier.ContactPerson"/>
-        <InputText @bind-Value="newSupplier.Phone" placeholder="Τηλέφωνο"/>
-        <ValidationMessage For="() => newSupplier.Phone"/>
-        <InputText @bind-Value="newSupplier.Email" placeholder="Email"/>
-        <ValidationMessage For="() => newSupplier.Email"/>
-        <button type="submit">Προσθήκη</button>
+        <ValidationSummary/>
+        
+        <MudGrid>
+        
+            <MudItem xs="12" md="6">
+                <MudTextField Label="Επωνυμία"
+                              @bind-Value="newSupplier.Name"
+                              Variant="Variant.Outlined"/>
+            </MudItem>
+        
+            <MudItem xs="12" md="6">
+                <MudTextField Label="Υπεύθυνος"
+                              @bind-Value="newSupplier.ContactPerson"
+                              Variant="Variant.Outlined"/>
+            </MudItem>
+        
+            <MudItem xs="12" md="6">
+                <MudTextField Label="Τηλέφωνο"
+                              InputType="InputType.Telephone"
+                              @bind-Value="newSupplier.Phone"
+                              Variant="Variant.Outlined"/>
+            </MudItem>
+        
+            <MudItem xs="12" md="6">
+                <MudTextField Label="Email"
+                              InputType="InputType.Email"
+                              @bind-Value="newSupplier.Email"
+                              Variant="Variant.Outlined"/>
+            </MudItem>
+        </MudGrid>
+        
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Class="mt-3"
+                   ButtonType="ButtonType.Submit">
+            Προσθήκη
+        </MudButton>
     </EditForm>
-</div>
+</MudPaper>
 
 
 @if (isEditing && editSupplier != null)
 {
-    <div class="warehouse-form">
-        <h4>Επεξεργασία προμηθευτή</h4>
+    <MudPaper Class="pa-4 mb-4" Elevation="1">
+        <MudText Typo="Typo.h6" Class="mb-3">Επεξεργασία προμηθευτή</MudText>
+        
         <EditForm Model="editSupplier" OnValidSubmit="SaveEdit">
             <DataAnnotationsValidator/>
-            <InputText @bind-Value="editSupplier.Name" placeholder="Επωνυμία"/>
-            <ValidationMessage For="() => editSupplier.Name"/>
-            <InputText @bind-Value="editSupplier.ContactPerson" placeholder="Υπεύθυνος"/>
-            <ValidationMessage For="() => editSupplier.ContactPerson"/>
-            <InputText @bind-Value="editSupplier.Phone" placeholder="Τηλέφωνο"/>
-            <ValidationMessage For="() => editSupplier.Phone"/>
-            <InputText @bind-Value="editSupplier.Email" placeholder="Email"/>
-            <ValidationMessage For="() => editSupplier.Email"/>
-            <button type="submit">Αποθήκευση</button>
-            <button type="button" @onclick="() => isEditing = false">Άκυρο</button>
+            <ValidationSummary/>
+            
+            <MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudTextField Label="Επωνυμία"
+                                  @bind-Value="editSupplier.Name"
+                                  Variant="Variant.Outlined"/>
+                </MudItem>
+                
+                <MudItem xs="12" md="6">
+                    <MudTextField Label="Υπεύθυνος"
+                                  @bind-Value="editSupplier.ContactPerson"
+                                  Variant="Variant.Outlined"/>
+                </MudItem>
+                
+                <MudItem xs="12" md="6">
+                    <MudTextField Label="Τηλέφωνο"
+                                  InputType="InputType.Telephone"
+                                  @bind-Value="editSupplier.Phone"
+                                  Variant="Variant.Outlined"/>
+                </MudItem>
+                
+                <MudItem xs="12" md="6">
+                    <MudTextField Label="Email"
+                                  InputType="InputType.Email"
+                                  @bind-Value="editSupplier.Email"
+                                  Variant="Variant.Outlined"/>
+                </MudItem>
+            </MudGrid>
+            
+            <MudStack Row="true" Spacing="2" Class="mt-3">
+                <MudButton ButtonType="ButtonType.Submit"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary">
+                    Αποθήκευση
+                </MudButton>
+                
+                <MudButton ButtonType="ButtonType.Button"
+                           Variant="Variant.Outlined"
+                           Color="Color.Secondary"
+                           @onclick="CancelEdit">
+                    Άκυρο
+                </MudButton>
+            </MudStack>
         </EditForm>
-    </div>
+    </MudPaper>
 }
 
-@if (errorMessage != null)
+@if (!string.IsNullOrWhiteSpace(errorMessage))
 {
-    <p style="color: red;">@errorMessage</p>
+    <MudAlert Severity="Severity.Error" Class="mb-4">
+        @errorMessage
+    </MudAlert>
 }
-@if (successMessage != null)
+
+@if (!string.IsNullOrWhiteSpace(successMessage))
 {
-    <p style="color: green;">@successMessage</p>
+    <MudAlert Severity="Severity.Success" Class="mb-4">
+        @successMessage
+    </MudAlert>
 }
 
 @if (suppliers == null)
 {
-    <p>φόρτωση....</p>
+    <MudProgressCircular Indeterminate="true" Class="my-4" />
+    <MudText Typo="Typo.body1">Φόρτωση...</MudText>
 }
+
 else if (!suppliers.Any())
 {
-    <p>Δεν υπάρχουν προμηθευτές.</p>
+    <MudAlert Severity="Severity.Info" Class="mb-4">
+        Δεν υπάρχουν προμηθευτές.
+    </MudAlert>
 }
+
 else
 {
-    <table class="warehouse-table">
-        <thead>
-        <tr>
-            <th>Επωνυμία</th>
-            <th>Υπεύθυνος</th>
-            <th>Τηλέφωνο</th>
-            <th>Email</th>
-            <th>Ενέργειες</th>
-        </tr>
-        </thead>
-        <tbody>
-    
-    @foreach (var supplier in suppliers)
-    {
-        <tr>
-            <td>@supplier.Name</td>
-            <td>@supplier.ContactPerson</td>
-            <td>@supplier.Phone</td>
-            <td>@supplier.Email</td>
-            <td>
-                <button @onclick="() => StartEdit(supplier)">Επεξεργασία</button>
-                <button class="btn-delete" @onclick="() => DeleteSupplier(supplier.Id)">Διαγραφή</button>
-            </td>
-        </tr>
-    }
-        </tbody>
-    </table>
+    <MudTable Items="suppliers" Hover="true" Striped="true" Bordered="true" Dense="true">
+        <HeaderContent>
+            <MudTh>Επωνυμία</MudTh>
+            <MudTh>Υπεύθυνος</MudTh>
+            <MudTh>Τηλέφωνο</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Ενέργειες</MudTh>
+        </HeaderContent>
+        
+        <RowTemplate>
+            <MudTd DataLabel="Επωνυμία">@context.Name</MudTd>
+            <MudTd DataLabel="Υπεύθυνος">@context.ContactPerson</MudTd>
+            <MudTd DataLabel="Τηλέφωνο">@context.Phone</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Ενέργειες">
+                <MudStack Row="true" Spacing="1">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                   Color="Color.Primary"
+                                   Size="Size.Medium"
+                                   OnClick="() => StartEdit(context)"/>
+                        
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                   Color="Color.Error"
+                                   Size="Size.Medium"
+                                   OnClick="() => DeleteSupplier(context.Id)"/>
+                </MudStack>
+            </MudTd>    
+        </RowTemplate>
+
+    </MudTable>
 }
 
 @code {
@@ -100,18 +177,34 @@ else
     private string? errorMessage;
     private string? successMessage;
 
-    protected override async Task OnInitializedAsync()
+    private void CancelEdit()
+    {
+        isEditing = false;
+        editSupplier = null;
+    }
+
+    private async Task LoadSuppliersAsync()
     {
         suppliers = await SupplierService.GetAllAsync();
     }
 
+    private void ClearMessages()
+    {
+        errorMessage = null;
+        successMessage = null;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSuppliersAsync();
+    }
+
     private async Task AddSupplier()
     {
-        successMessage = null;
-        errorMessage = null;
+        ClearMessages();
         await SupplierService.AddAsync(newSupplier);
         newSupplier = new Supplier();
-        suppliers = await SupplierService.GetAllAsync();
+        await LoadSuppliersAsync();
         successMessage = "Ο προμηθευτής καταχωρήθηκε!";
     }
 
@@ -130,24 +223,29 @@ else
 
     private async Task SaveEdit()
     {
-        if (editSupplier != null)
-        {
+            if (editSupplier == null)
+                return;
+            
+            ClearMessages();
+            
             await SupplierService.UpdateAsync(editSupplier);
-            isEditing = false;
-            editSupplier = null;
-            suppliers = await SupplierService.GetAllAsync();
+            CancelEdit();
+            await LoadSuppliersAsync();
             successMessage = "Ο προμηθευτής ενημερώθηκε!";
             
-        }
+        
     }
 
     private async Task DeleteSupplier(int id)
     {
         var confirmed = await JS.InvokeAsync<bool>("confirm", "Είσαι σίγουρος για την διαγραφή");
         if (!confirmed) return;
-        await SupplierService.DeleteAsync(id);
-        suppliers = await SupplierService.GetAllAsync();
+        ClearMessages();
         
+        await SupplierService.DeleteAsync(id);
+        await LoadSuppliersAsync();
+        successMessage = "Ο προμηθευτής διαγράφηκε!";
+
     }
 
 }
