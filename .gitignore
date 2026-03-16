@@ -1,7 +1,28 @@
+## Build outputs
 bin/
 obj/
 /packages/
 riderModule.iml
-/_ReSharper.Caches/.idea/
+/_ReSharper.Caches/
+
+## IDE
+.idea/
 *.user
+*.suo
 *.DotSettings.user
+
+## SQLite
+*.db
+*.db-shm
+*.db-wal
+
+## Logs
+*.log
+logs/
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Published output
+publish/
