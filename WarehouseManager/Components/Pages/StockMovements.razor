@@ -1,5 +1,4 @@
 @page "/stock-movements"
-@using Microsoft.VisualBasic
 @using WarehouseManager.Services
 @using WarehouseManager.Models
 @inject StockMovementService MovementService
@@ -8,75 +7,129 @@
 
 <h3>Κινήσεις αποθήκης</h3>
 
-<div class="warehouse-form">
-    <h4>Νέα Κίνηση</h4>
-    <select @bind="newMovement.ProductId">
-        <option value="0">-- Επιλέξτε Προϊόν --</option>
-        @foreach (var product in products ?? new List<Product>())
-        {
-            <option value="@product.Id">@product.Name
-                (@product.SKU)</option>
-        }
-    </select>
-    <select @bind="newMovement.MovementType">
-        <option value="IN">IN - Εισαγωγή</option>
-        <option value="OUT">OUT - Εξαγωγή</option>
-    </select>
-    <input type="number" @bind="newMovement.Quantity" placeholder="Ποσότητα"/>
-    <input @bind="newMovement.Notes" placeholder="Σημειώσεις"/>
-    @if (errorMessage != null)
-    {
-        <p style="color: red;">@errorMessage</p>
-    }
-    @if (successMessage != null)
-    {
-        <p style="color: green">@successMessage</p>
-    }
-    <button @onclick="AddMovement">Καταχώρηση</button>
-</div>
+
+<MudPaper Class="pa-4 mb-4" Elevation="1">
+    <MudText Typo="Typo.h6" Class="mb-3">Νέα Κίνηση</MudText>
+    
+    <MudGrid>
+        <MudItem xs="12" md="6">
+            <MudSelect T="int"
+                       Label="Προϊόν"
+                       @bind-Value="newMovement.ProductId"
+                       Variant="Variant.Outlined">
+                <MudSelectItem Value="0">--Επιλέξτε προϊόν</MudSelectItem>
+                @foreach (var product in products ?? Enumerable.Empty<Product>())
+                {
+                    <MudSelectItem Value="@product.Id">@product.Name (@product.SKU)</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        
+        <MudItem xs="12" md="6">
+            <MudSelect T="string"
+                       Label="Τύπος κίνησης"
+                       @bind-Value="newMovement.MovementType"
+                       Variant="Variant.Outlined">
+                <MudSelectItem Value=@("IN")>IN - Εισαγωγή</MudSelectItem>
+                <MudSelectItem Value=@("OUT")>OUT - Εξαγωγή</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        
+        <MudItem xs="12" md="6">
+            <MudNumericField T="int"
+                             Label="Ποσότητα"
+                             @bind-Value="newMovement.Quantity"
+                             Variant="Variant.Outlined"/>
+        </MudItem>
+        
+        <MudItem xs="12" md="6">
+            <MudTextField Label="Σημειώσεις"
+                          @bind-Value="newMovement.Notes"
+                          Variant="Variant.Outlined"/>
+        </MudItem>
+        
+    </MudGrid>
+    
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               Class="mt-3"
+               OnClick="AddMovement">
+        Καταχώρηση
+    </MudButton>
+</MudPaper>
+
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <MudAlert Severity="Severity.Error" Class="mb-4">
+        @errorMessage
+    </MudAlert>
+}
+
+@if (!string.IsNullOrWhiteSpace(successMessage))
+{
+    <MudAlert Severity="Severity.Success" Class="mb-4">
+        @successMessage
+    </MudAlert>
+}
 
 @if (movements == null)
 {
-    <p>Φόρτωση...</p>
+    <MudProgressCircular Indeterminate="true" Class="my-4"/>
+    <MudText Typo="Typo.body1">Φόρτωση...</MudText>
 }
 else if (!movements.Any())
 {
-    <p>Δεν υπάρχουν κινήσεις.</p>
+    <MudAlert Severity="Severity.Info" Class="mb-4">
+        Δεν υπάρχουν κινήσεις.
+    </MudAlert>
 }
 else
 {
-    <table class="warehouse-table">
-        <thead>
-        <tr>
-            <th>Ημερομηνία</th>
-            <th>Προϊόν</th>
-            <th>Τύπος</th>
-            <th>Ποσότητα</th>
-            <th>Σημειώσεις</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var movement in movements)
-        {
-            <tr>
-                <td>@movement.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                <td>@movement.Product?.Name</td>
-                <td style="color: @(movement.MovementType == "IN" ? "green" : "red")">
-                    @movement.MovementType
-                </td>
-                <td>@movement.Quantity</td>
-                <td>@movement.Notes</td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    <MudTable Items="movements" Hover="true" Striped="true" Bordered="true" Dense="true">
+        
+        <HeaderContent>
+            <MudTh>Ημερομηνία</MudTh>
+            <MudTh>Προϊόν</MudTh>
+            <MudTh>Τύπος</MudTh>
+            <MudTh>Ποσότητα</MudTh>
+            <MudTh>Σημειώσεις</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Ημερομηνία">
+                @context.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+            </MudTd>
+            
+            <MudTd DataLabel="Προϊόν">
+                @context.Product?.Name
+            </MudTd>
+            
+            <MudTd DataLabel="Τύπος">
+                <MudChip T="string"
+                         Color="@(context.MovementType == "IN" ? Color.Success : Color.Error)"
+                         Variant="Variant.Filled"
+                         Size="Size.Small">
+                    @context.MovementType
+                </MudChip>
+            </MudTd>
+            
+            <MudTd DataLabel="Ποσότητα">
+                @context.Quantity
+            </MudTd>
+            
+            <MudTd DataLabel="Σημειώσεις">
+                @context.Notes
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+    
+    
 }
 
 @code {
     private List<StockMovement>? movements;
-    private List<Product> products;
-    private string errorMessage;
-    private string successMessage;
+    private List<Product>? products;
+    private string? errorMessage;
+    private string? successMessage;
 
     private StockMovement newMovement = new StockMovement
     {
