@@ -1,6 +1,10 @@
+cat > .gitignore << 'EOF'
 ## Build outputs
 bin/
 obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
 
 ## IDE
 .idea/
@@ -23,3 +27,4 @@ Thumbs.db
 
 ## Published output
 publish/
+EOF
