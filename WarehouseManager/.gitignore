@@ -6,6 +6,7 @@ obj/
 .idea/
 *.user
 *.suo
+*.DotSettings.user
 
 ## SQLite
 *.db
