@@ -18,8 +18,11 @@ public class ProductClientService
     public async Task<Product?> GetByIdAsync(int id) =>
         await _http.GetFromJsonAsync<Product>($"api/products/{id}");
 
-    public async Task AddAsync(Product product) =>
-        await _http.PostAsJsonAsync("api/products", product);
+    public async Task<Product?> AddAsync(Product product)
+    {
+        var response = await _http.PostAsJsonAsync("api/products", product);
+        return await response.Content.ReadFromJsonAsync<Product>();
+    }
 
     public async Task UpdateAsync(Product product) =>
         await _http.PutAsJsonAsync($"api/products/{product.Id}", product);

@@ -71,8 +71,7 @@
 </MudPaper>
 
 
-<MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-4">
-    <MudText Typo="Typo.h4">Προϊόντα</MudText>
+<MudStack Row="true" Justify="Justify.FlexEnd" AlignItems="AlignItems.Center" Class="mb-4">
 
     <MudTextField @bind-Value="searchTerm"
                   Style="width: 300px"
@@ -171,12 +170,12 @@
     </MudAlert>
 }
 
-@if (products == null)
+@if (isLoading)
 {
     <MudProgressCircular Indeterminate="true" Class="my-4" />
     <MudText Typo="Typo.body1">Φόρτωση...</MudText>
 }
-else if (!products.Any())
+else if (string.IsNullOrWhiteSpace(errorMessage) && !products!.Any())
 {
     <MudAlert Severity="Severity.Info" Class="mb-4">
         Δεν υπάρχουν προϊόντα.
@@ -240,6 +239,7 @@ else
 
     private string? errorMessage;
     private string? successMessage;
+    private bool isLoading = true;
 
     private IEnumerable<Product> filteredProducts =>
         products?.Where(p =>
@@ -281,15 +281,32 @@ else
     {
         successMessage = null;
         errorMessage = null;
-        await ProductsService.AddAsync(newProduct);
+        var created = await ProductsService.AddAsync(newProduct);
+
+        if (created != null)
+        {
+            products?.Add(created);
+        }
         newProduct = new Product();
-        products = await ProductsService.GetAllAsync();
+        
         successMessage = "Το προϊόν προστέθηκε!";
     }
 
     protected override async Task OnInitializedAsync()
     {
-        products = await ProductsService.GetAllAsync();
+        try
+        {
+            products = await ProductsService.GetAllAsync();
+        }
+        catch
+        {
+            errorMessage = "Αποτυχία φόρτωσης προϊόντων.";
+            products = new List<Product>();
+        }
+        finally
+        {
+            isLoading = false;
+        }
     }
 
     private async Task DeleteProduct(int id)
