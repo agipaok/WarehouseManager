@@ -1,0 +1,30 @@
+﻿<MudThemeProvider/>
+<MudPopoverProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+@inherits LayoutComponentBase
+
+@code
+{
+    private bool _drawerOpen = true;
+}
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                       Color="Color.Inherit"
+                       Edge="Edge.Start"
+                       @onclick="() => _drawerOpen = !_drawerOpen"/>
+        <MudText Typo="Typo.h6">WarehouseManager</MudText>
+        <MudSpacer/>
+        <MudText Typo="Typo.body2">Inventory App</MudText>
+    </MudAppBar>
+    
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="1" Variant="DrawerVariant.Responsive" Anchor="Anchor.Start" Width="260px">
+        <NavMenu/>
+    </MudDrawer>
+    
+    <MudMainContent Class="pa-4">
+        @Body
+    </MudMainContent>
+</MudLayout>

@@ -1,0 +1,95 @@
+﻿@page "/"
+@using WarehouseManager.Services
+@using WarehouseManager.Models
+@inject ProductService ProductsService
+@inject SupplierService SupplierService
+@inject StockMovementService MovementService
+
+<PageTitle>Αποθήκη</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Dashboard</MudText>
+
+@if (products == null)
+{
+    <MudText Typo="Typo.body1">Φόρτωση...</MudText>
+}
+else
+{
+    <MudGrid Class="mb-6">
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.subtitle2" Color="Color.Secondary">Συνολικά Προϊόντα</MudText>
+                    <MudText Typo="Typo.h4">@products.Count</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.subtitle2" Color="Color.Warning">Χαμηλό Stock</MudText>
+                    <MudText Typo="Typo.h4">@lowStockProducts.Count</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.subtitle2" Color="Color.Secondary">Κινήσεις σήμερα</MudText>
+                    <MudText Typo="Typo.h4">@(movements?.Count(m => m.CreatedAt.Date == DateTime.Today) ?? 0)</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.subtitle2" Color="Color.Secondary">Προμηθευτές</MudText>
+                    <MudText Typo="Typo.h4">@(suppliers?.Count ?? 0)</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+    
+    @if (lowStockProducts.Any())
+    {
+        <MudPaper Class="pa-4" Elevation="2">
+            <MudText Typo="Typo.h6" Class="mb-3">Προϊόντα με χαμηλό Stock</MudText>
+            
+            <MudTable T="Product" Items="lowStockProducts" Hover="true" Striped="true" Dense="true">
+                <HeaderContent>
+                    <MudTh>Κωδικός</MudTh>
+                    <MudTh>Όνομα</MudTh>
+                    <MudTh>Stock</MudTh>
+                    <MudTh>Ελάχιστο</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Κωδικός">@context.SKU</MudTd>
+                    <MudTd DataLabel="Όνομα">@context.Name</MudTd>
+                    <MudTd DataLabel="Stock">@context.Stock</MudTd>
+                    <MudTd DataLabel="Ελάχιστο">@context.MinStock</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudPaper>
+    }
+}
+
+
+@code
+{
+    private List<Product>? products;
+    private List<Product> lowStockProducts = new();
+    private List<Supplier>? suppliers;
+    private List<StockMovement>? movements;
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ProductsService.GetAllAsync();
+        lowStockProducts = products.Where(p => p.Stock <= p.MinStock).ToList();
+        suppliers = await SupplierService.GetAllAsync();
+        movements = await MovementService.GetAllAsync();
+
+    }
+}
