@@ -12,7 +12,12 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
-      <PackageReference Include="MudBlazor" Version="9.1.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\WarehouseManager.Shared\WarehouseManager.Shared.csproj" />
+      <ProjectReference Include="..\WarehouseManager.Client\WarehouseManager.Client.csproj" />
     </ItemGroup>
 
 </Project>
