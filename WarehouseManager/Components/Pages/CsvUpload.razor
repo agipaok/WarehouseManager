@@ -4,7 +4,6 @@
 @using System.Text
 @using System.IO
 @using System.Linq
-@using Microsoft.AspNetCore.Mvc
 @using WarehouseManager.Models
 @using WarehouseManager.Services
 @inject ProductService ProductService
@@ -12,7 +11,10 @@
 <MudText Typo="Typo.h4" Class="mb-4">CSV Upload</MudText>
 
 <MudPaper Class="pa-4">
-    <MudText Typo="Typo.body1">Εδώ θα ανεβάσουμε CSV</MudText>
+
+    <MudText Typo="Typo.body1">
+        Εδώ θα ανεβάσουμε CSV
+    </MudText>
 
     <InputFile OnChange="HandleFileSelected" accept=".csv" />
 
@@ -20,47 +22,63 @@
         @selectedFileName
     </MudText>
 
-    @if (!string.IsNullOrWhiteSpace(fileContentPreview))
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <MudAlert Severity="Severity.Error" Class="mt-4">
+            @errorMessage
+        </MudAlert>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(successMessage))
+    {
+        <MudAlert Severity="Severity.Success" Class="mt-4">
+            @successMessage
+        </MudAlert>
+    }
+
+    @if (hasParsedFile && parsedRows.Any())
     {
         <MudPaper Class="pa-4 mt-4">
-           
 
-            @if (parsedRows.Any())
-            {
-                <MudTable Items="parsedRows" Dense="true" Class="mt-4">
-                    <HeaderContent>
-                        <MudTh>SKU</MudTh>
-                        <MudTh>Όνομα</MudTh>
-                        <MudTh>Κατηγορία</MudTh>
-                        <MudTh>Τιμή</MudTh>
-                        <MudTh>Stock</MudTh>
-                        <MudTh>Min Stock</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="SKU">@context.SKU</MudTd>
-                        <MudTd DataLabel="Όνομα">@context.Name</MudTd>
-                        <MudTd DataLabel="Κατηγορία">@context.Category</MudTd>
-                        <MudTd DataLabel="Τιμή">@context.Price</MudTd>
-                        <MudTd DataLabel="Stock">@context.Stock</MudTd>
-                        <MudTd DataLabel="Min Stock">@context.MinStock</MudTd>
-                    </RowTemplate>
-                </MudTable>
-                
-                <MudButton Variant="Variant.Filled"
-                           Color="Color.Primary"
-                           Class="mt-4"
-                           OnClick="SaveToDatabase">
-                    Αποθήκευση στην βάση
-                </MudButton>
-            }
+            <MudTable Items="parsedRows" Dense="true">
+                <HeaderContent>
+                    <MudTh>SKU</MudTh>
+                    <MudTh>Όνομα</MudTh>
+                    <MudTh>Κατηγορία</MudTh>
+                    <MudTh>Τιμή</MudTh>
+                    <MudTh>Stock</MudTh>
+                    <MudTh>Min Stock</MudTh>
+                </HeaderContent>
+
+                <RowTemplate>
+                    <MudTd>@context.SKU</MudTd>
+                    <MudTd>@context.Name</MudTd>
+                    <MudTd>@context.Category</MudTd>
+                    <MudTd>@context.Price</MudTd>
+                    <MudTd>@context.Stock</MudTd>
+                    <MudTd>@context.MinStock</MudTd>
+                </RowTemplate>
+            </MudTable>
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Class="mt-4"
+                       OnClick="SaveToDatabase">
+                Αποθήκευση στην βάση
+            </MudButton>
+
         </MudPaper>
     }
+
 </MudPaper>
 
 @code {
     private string selectedFileName = "Δεν έχει επιλεγεί αρχείο.";
-    private string fileContentPreview = string.Empty;
     private List<ProductImportRow> parsedRows = new();
+
+    private bool hasParsedFile = false;
+    private string? errorMessage;
+    private string? successMessage;
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
@@ -70,15 +88,17 @@
             return;
 
         selectedFileName = $"Επιλέχθηκε: {file.Name}";
+        errorMessage = null;
+        successMessage = null;
 
         using var stream = file.OpenReadStream();
         using var reader = new StreamReader(stream, Encoding.UTF8);
 
         var content = await reader.ReadToEndAsync();
 
-        fileContentPreview = content;
-
         ParseCsv(content);
+
+        hasParsedFile = true;
     }
 
     private void ParseCsv(string content)
@@ -91,7 +111,7 @@
         {
             var values = line.Split(',');
 
-            if (values.Length != 4)
+            if (values.Length < 6)
                 continue;
 
             var row = new ProductImportRow
@@ -99,9 +119,9 @@
                 SKU = values[0].Trim(),
                 Name = values[1].Trim(),
                 Category = values[2].Trim(),
-                Price = decimal.Parse(values[3].Trim()),
-                Stock = int.Parse(values[4].Trim()),
-                MinStock = int.Parse(values[5].Trim())
+                Price = decimal.TryParse(values[3].Trim(), out var price) ? price : 0,
+                Stock = int.TryParse(values[4].Trim(), out var stock) ? stock : 0,
+                MinStock = int.TryParse(values[5].Trim(), out var minStock) ? minStock : 0
             };
 
             parsedRows.Add(row);
@@ -110,20 +130,34 @@
 
     private async Task SaveToDatabase()
     {
-        foreach (var row in parsedRows )
-        {
-            var product = new Product
-            {
-                SKU = row.SKU,
-                Name = row.Name,
-                Category = row.Category,
-                Price = row.Price,
-                Stock = row.Stock,
-                MinStock = row.MinStock
-                
-            };
+        successMessage = null;
+        errorMessage = null;
 
-            await ProductService.AddAsync(product);
+        try
+        {
+            foreach (var row in parsedRows)
+            {
+                var product = new Product
+                {
+                    SKU = row.SKU,
+                    Name = row.Name,
+                    Category = row.Category,
+                    Price = row.Price,
+                    Stock = row.Stock,
+                    MinStock = row.MinStock
+                };
+
+                await ProductService.AddAsync(product);
+            }
+
+            successMessage = $"Αποθηκεύτηκαν {parsedRows.Count} προϊόντα.";
+            parsedRows.Clear();
+            hasParsedFile = false;
+            selectedFileName = "Ολοκληρώθηκε.";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
         }
     }
 }
