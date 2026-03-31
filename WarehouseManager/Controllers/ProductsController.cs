@@ -29,7 +29,7 @@ public class ProductsController : ControllerBase
     public async Task<IActionResult> Create(Product product)
     {
         await _service.AddAsync(product);
-        return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
+        return Ok(product);
     }
 
     [HttpPut("{id}")]
