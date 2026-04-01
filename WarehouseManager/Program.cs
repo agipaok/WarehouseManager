@@ -4,7 +4,8 @@ using WarehouseManager.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=warehouse.db"));
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<SupplierService>();
 builder.Services.AddScoped<StockMovementService>();

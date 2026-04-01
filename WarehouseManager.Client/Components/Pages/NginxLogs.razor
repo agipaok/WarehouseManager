@@ -1,0 +1,136 @@
+﻿@page "/nginx-logs"
+@using Microsoft.AspNetCore.Components.Forms
+@using WarehouseManager.Shared.Models
+@inject HttpClient Http
+
+<PageTitle>Nginx Logs</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Nginx Logs</MudText>
+
+<MudPaper Class="pa-4">
+
+    <InputFile OnChange="HandleFileSelected" accept=".csv" />
+
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <MudAlert Severity="@alertSeverity" Class="mt-3">
+            @message
+        </MudAlert>
+    }
+
+    @if (logs is not null && logs.Any())
+    {
+        <MudText Class="mt-3">Loaded @logs.Count records</MudText>
+
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Class="mt-2"
+                   OnClick="SaveLogsToApi"
+                   Disabled="@isSaving">
+            @(isSaving ? "Saving..." : "Save to SQL Server")
+        </MudButton>
+
+        <MudTable Items="logs" Dense="true" Class="mt-4">
+            <HeaderContent>
+                <MudTh>IP</MudTh>
+                <MudTh>User</MudTh>
+                <MudTh>Path</MudTh>
+                <MudTh>Status</MudTh>
+                <MudTh>Bytes</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.RemoteIpAddress</MudTd>
+                <MudTd>@context.RemoteUser</MudTd>
+                <MudTd>@context.RequestPath</MudTd>
+                <MudTd>@context.StatusCode</MudTd>
+                <MudTd>@context.BytesSent</MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+
+</MudPaper>
+
+@code {
+    private List<NginxLogEntry>? logs;
+
+    private string? message;
+    private Severity alertSeverity;
+
+    private bool isSaving = false;
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        message = null;
+
+        var file = e.File;
+
+        using var stream = file.OpenReadStream();
+        using var reader = new StreamReader(stream);
+
+        var content = await reader.ReadToEndAsync();
+
+        logs = new List<NginxLogEntry>();
+
+        var lines = content.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (var line in lines.Skip(1))
+        {
+            var parts = line.Split(',');
+
+            var log = new NginxLogEntry
+            {
+                Id = long.Parse(parts[0]),
+                Epoch = long.Parse(parts[1]),
+                RemoteIpAddress = parts[2],
+                RemoteUser = parts[3],
+                Timestamp = DateTimeOffset.Parse(parts[4]),
+                RequestPath = parts[5],
+                StatusCode = int.Parse(parts[6]),
+                BytesSent = long.Parse(parts[7])
+            };
+
+            logs.Add(log);
+        }
+
+        message = $"Loaded {logs.Count} logs successfully";
+        alertSeverity = Severity.Info;
+    }
+
+    private async Task SaveLogsToApi()
+    {
+        if (logs is null || !logs.Any())
+            return;
+
+        try
+        {
+            isSaving = true;
+            message = null;
+
+            var response = await Http.PostAsJsonAsync("/api/NginxLogs", logs);
+
+            if (response.IsSuccessStatusCode)
+            {
+                message = "Logs saved successfully to database";
+                alertSeverity = Severity.Success;
+
+                logs.Clear(); // optional καθάρισμα μετά το save
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+
+                message = $"Error saving logs: {error}";
+                alertSeverity = Severity.Error;
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"Exception: {ex.Message}";
+            alertSeverity = Severity.Error;
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+}
