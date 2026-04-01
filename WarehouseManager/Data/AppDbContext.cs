@@ -13,4 +13,5 @@ public class AppDbContext : DbContext
     public DbSet<Product> Products { get; set; }
     public DbSet<Supplier> Suppliers { get; set; }
     public DbSet<StockMovement> StockMovements { get; set; }
+    public DbSet<NginxLogEntry> NginxLogEntries { get; set; }
 }

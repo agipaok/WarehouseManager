@@ -1,0 +1,154 @@
+﻿@page "/nginx-logs"
+@using WarehouseManager.Models
+@using WarehouseManager.Services
+@inject NginxLogService NginxLogService
+
+<PageTitle>Nginx Logs</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Nginx Logs Import</MudText>
+
+<MudPaper Class="pa-4">
+
+    <InputFile OnChange="HandleFileSelected" accept=".csv" />
+    
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <MudAlert Severity="Severity.Error" Class="mt-4">
+            @errorMessage
+        </MudAlert>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(successMessage))
+    {
+        <MudAlert Severity="Severity.Success" Class="mt-4">
+            @successMessage
+        </MudAlert>
+    }
+
+    @if (parsedLogs.Any())
+    {
+        <MudText Class="mt-4">
+            Βρέθηκαν @parsedLogs.Count εγγραφές
+        </MudText>
+        
+        <MudTable Items="parsedLogs" Hover="true" Striped="true" Dense="true" RowsPerPage="20">
+            <HeaderContent>
+                <MudTh>Id</MudTh>
+                <MudTh>Epoch</MudTh>
+                <MudTh>IP</MudTh>
+                <MudTh>User</MudTh>
+                <MudTh>Timestamp</MudTh>
+                <MudTh>Path</MudTh>
+                <MudTh>Status</MudTh>
+                <MudTh>Bytes</MudTh>
+            </HeaderContent>
+
+            <RowTemplate>
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="Epoch">@context.Epoch</MudTd>
+                <MudTd DataLabel="IP">@context.RemoteIpAddress</MudTd>
+                <MudTd DataLabel="User">@context.RemoteUser</MudTd>
+                <MudTd DataLabel="Timestamp">@context.Timestamp</MudTd>
+                <MudTd DataLabel="Path">@context.RequestPath</MudTd>
+                <MudTd DataLabel="Status">@context.StatusCode</MudTd>
+                <MudTd DataLabel="Bytes">@context.BytesSent</MudTd>
+            </RowTemplate>
+
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Class="mt-2"
+                   OnClick="SaveLogsAsync">
+            Αποθήκευση στη βάση
+        </MudButton>
+    }
+
+</MudPaper>
+
+@code {
+    private List<NginxLogEntry> parsedLogs = new();
+    private string? errorMessage;
+    private string? successMessage;
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        errorMessage = null;
+        successMessage = null;
+
+        try
+        {
+            const long maxFileSize = 1024 * 1024; // 1 MB
+
+            await using var stream = file.OpenReadStream(maxFileSize);
+            using var memoryStream = new MemoryStream();
+
+            await stream.CopyToAsync(memoryStream);
+
+            memoryStream.Position = 0;
+
+            using var reader = new StreamReader(memoryStream);
+            var content = await reader.ReadToEndAsync();
+
+            var lines = content
+                .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
+                .Skip(1)
+                .ToList();
+
+            parsedLogs = new List<NginxLogEntry>();
+
+            foreach (var line in lines)
+            {
+                var parts = line.Split(',');
+
+                var log = new NginxLogEntry
+                {
+                    Id = long.Parse(parts[0]),
+                    Epoch = long.Parse(parts[1]),
+                    RemoteIpAddress = parts[2],
+                    RemoteUser = parts[3],
+                    Timestamp = DateTimeOffset.Parse(parts[4]),
+                    RequestPath = parts[5],
+                    StatusCode = int.Parse(parts[6]),
+                    BytesSent = long.Parse(parts[7])
+                };
+
+                parsedLogs.Add(log);
+            }
+
+            successMessage = $"Το αρχείο φορτώθηκε επιτυχώς. Έγιναν parse {parsedLogs.Count} εγγραφές.";
+        }
+        catch (Exception ex)
+        {
+            parsedLogs.Clear();
+            errorMessage = $"Σφάλμα κατά το διάβασμα του CSV: {ex.Message}";
+        }
+    }
+
+    private async Task SaveLogsAsync()
+    {
+        if (!parsedLogs.Any())
+            return;
+
+        errorMessage = null;
+        successMessage = null;
+
+        try
+        {
+            var count = parsedLogs.Count;
+
+            await NginxLogService.AddRangeAsync(parsedLogs);
+
+            parsedLogs.Clear();
+            successMessage = $"Αποθηκεύτηκαν επιτυχώς {count} εγγραφές στη βάση.";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Σφάλμα κατά την αποθήκευση στη βάση: {ex.Message}";
+        }
+    }
+}
